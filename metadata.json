@@ -1,0 +1,8 @@
+{
+  "name": "Serenity Smart Booking",
+  "description": "Premium massage appointment system with Supabase Auth, Realtime Dashboard, and Gemini AI Summaries.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
