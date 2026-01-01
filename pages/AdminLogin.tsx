@@ -110,6 +110,15 @@ const AdminLogin: React.FC = () => {
               )}
             </button>
           </form>
+<div className="mt-8 text-center">
+  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+    Demo Admin Credentials
+  </p>
+  <p className="text-sm font-mono text-slate-600">
+    Email: <span className="font-bold">admin@demo.com</span><br />
+    Password: <span className="font-bold">admin123</span>
+  </p>
+</div>
 
           <div className="mt-10 pt-8 border-t border-slate-50 text-center">
             <p className="text-[9px] text-slate-300 font-black uppercase tracking-[0.3em] leading-relaxed">
