@@ -1,12 +1,18 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
-
-// Fix: Use process.env.API_KEY directly in the named parameter object
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
+// Gemini AI is optional - only used if API key is available
 export const summarizeAppointmentNotes = async (notes: string, serviceType: string) => {
-  // Fix: Removed the manual check for process.env.API_KEY as per guidelines assuming it's pre-configured
+  // Check if API key is available
+  const apiKey = import.meta.env?.VITE_GEMINI_API_KEY;
+
+  // If no API key, return a simple formatted version of notes
+  if (!apiKey) {
+    return `Client notes for ${serviceType} session: ${notes.substring(0, 200)}${notes.length > 200 ? '...' : ''}`;
+  }
+
   try {
+    const { GoogleGenAI } = await import("@google/genai");
+    const ai = new GoogleGenAI({ apiKey });
+
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: `Summarize the following client notes for a ${serviceType} massage session. 
@@ -19,17 +25,32 @@ export const summarizeAppointmentNotes = async (notes: string, serviceType: stri
         topP: 0.95,
       }
     });
-    
-    // Fix: Access response.text directly (it is a property, not a method)
+
     return response.text || "No summary generated.";
   } catch (error) {
     console.error("AI Summary Error:", error);
-    return "Error generating summary.";
+    return `Client notes: ${notes}`;
   }
 };
 
 export const getRecoveryTips = async (serviceType: string) => {
+  // Default recovery tips
+  const defaultTips = [
+    "Stay hydrated - drink plenty of water",
+    "Avoid heavy lifting for 24 hours",
+    "Rest well and listen to your body"
+  ];
+
+  const apiKey = import.meta.env?.VITE_GEMINI_API_KEY;
+
+  if (!apiKey) {
+    return defaultTips;
+  }
+
   try {
+    const { GoogleGenAI, Type } = await import("@google/genai");
+    const ai = new GoogleGenAI({ apiKey });
+
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: `Provide 3 brief post-care recovery tips for a client who just had a ${serviceType} session.`,
@@ -43,10 +64,10 @@ export const getRecoveryTips = async (serviceType: string) => {
         }
       }
     });
-    
-    // Fix: Access response.text property directly
+
     return JSON.parse(response.text || "[]") as string[];
   } catch (error) {
-    return ["Stay hydrated", "Avoid heavy lifting", "Rest well"];
+    console.log("Using default recovery tips");
+    return defaultTips;
   }
 };
